@@ -21,7 +21,7 @@ New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
 New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS | Out-Null
 $currentexename = (([Diagnostics.Process]::GetCurrentProcess().ProcessName) + '.exe')
 	if ($currentexename -eq "pwsh.exe") {
-		Start-Process Powershell -Argumentlist '-ExecutionPolicy bypass -NoProfile -command "irm "https://github.com/DaddyMadu/Windows10GamingFocus/raw/master/win10debloatandgamingtweaks.ps1" | iex"' -Verb RunAs
+		Start-Process Powershell -Argumentlist '-ExecutionPolicy bypass -NoProfile -command "irm "https://github.com/Winsmh/win10debloatand/raw/master/win10debloatandgamingtweaks.ps1" | iex"' -Verb RunAs
 		exit
 	}
 Clear-Host
@@ -3393,7 +3393,7 @@ Function Finished {
 # Relaunch the script with administrator privileges
 Function RequireAdmin {
 	If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-		Start-Process Powershell -Argumentlist '-ExecutionPolicy bypass -NoProfile -command "irm "https://github.com/DaddyMadu/Windows10GamingFocus/raw/master/win10debloatandgamingtweaks.ps1" | iex"' -Verb RunAs
+		Start-Process Powershell -Argumentlist '-ExecutionPolicy bypass -NoProfile -command "irm "https://github.com/Winsmh/win10debloatand/raw/master/win10debloatandgamingtweaks.ps1" | iex"' -Verb RunAs
 		Exit
 	}
 }
