@@ -1583,7 +1583,7 @@ Function PowerThrottlingOff {
 #Setting Processor scheduling.
 Function Win32PrioritySeparation {
 	Write-Output "Setting Processor scheduling..."
-	Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" -Name "Win32PrioritySeparation" -Type DWord -Value 0x00000028
+	Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" -Name "Win32PrioritySeparation" -Type DWord -Value 0x00fa332a
 }
 
 #Disabling aero shake.
