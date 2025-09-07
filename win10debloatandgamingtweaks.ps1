@@ -202,7 +202,6 @@ $tweaks = @(
 	"StophighDPC",
 	"NvidiaTweaks",
 	"AMDGPUTweaks",
- 	"NetworkAdapterRSS",
 	"NetworkOptimizations",
  	"DisableNagle",
 	"RemoveEdit3D",
@@ -373,7 +372,6 @@ $mobiletweaks = @(
 	"StophighDPC",
 	"NvidiaTweaks",
 	"AMDGPUTweaks",
- 	"NetworkAdapterRSS",
 	"NetworkOptimizations",
  	"DisableNagle",
 	"RemoveEdit3D",
@@ -3242,72 +3240,6 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters
 $ErrorActionPreference = $errpref #restore previous preference
 }
 
-#setting network adabter optimal rss
-Function NetworkAdapterRSS {
-$errpref = $ErrorActionPreference #save actual preference
-$ErrorActionPreference = "silentlycontinue"
-Write-Output "Setting network adapter RSS..."
-	$PhysicalAdapters = Get-WmiObject -Class Win32_NetworkAdapter|Where-Object{$_.PNPDeviceID -notlike "ROOT\*" -and $_.Manufacturer -ne "Microsoft" -and $_.ConfigManagerErrorCode -eq 0 -and $_.ConfigManagerErrorCode -ne 22}
-	
-	Foreach($PhysicalAdapter in $PhysicalAdapters)
-	{
-		# $PhysicalAdapterName = $PhysicalAdapter.Name
-		$DeviceID = $PhysicalAdapter.DeviceID
-		If([Int32]$DeviceID -lt 10)
-		{
-			$AdapterDeviceNumber = "000"+$DeviceID
-		}
-		Else
-		{
-			$AdapterDeviceNumber = "00"+$DeviceID
-		}
-		$KeyPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002bE10318}\$AdapterDeviceNumber"
-		$KeyPath2 = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002bE10318}\$AdapterDeviceNumber\Ndi\params\*RSS\Enum"
-		$KeyPath3 = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002bE10318}\$AdapterDeviceNumber\Ndi\params\*RSS"
-		$KeyPath4 = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002bE10318}\$AdapterDeviceNumber\Ndi\params\*NumRssQueues\Enum"
-		$KeyPath5 = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002bE10318}\$AdapterDeviceNumber\Ndi\params\*NumRssQueues"
-		$KeyPath6 = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002bE10318}\$AdapterDeviceNumber\Ndi\params\*ReceiveBuffers"
-		$KeyPath7 = "HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002bE10318}\$AdapterDeviceNumber\Ndi\params\*TransmitBuffers"
-		
-		If(Test-Path -Path $KeyPath)
-			{
-					new-Item -Path $KeyPath2 -Force | Out-Null
-					new-Item -Path $KeyPath4 -Force | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*NumRssQueues" -Type String -Value 2 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*RSS" -Type String -Value 1 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*RSSProfile" -Type String -Value 4 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*RssBaseProcNumber" -Type String -Value 2 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*MaxRssProcessors" -Type String -Value 4 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*NumaNodeId" -Type String -Value 0 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*RssBaseProcGroup" -Type String -Value 0 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*RssMaxProcNumber" -Type String -Value 4 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*RssMaxProcGroup" -Type String -Value 0 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*ReceiveBuffers" -Type String -Value 2048 | Out-Null
-					Set-ItemProperty -Path $KeyPath -Name "*TransmitBuffers" -Type String -Value 4096 | Out-Null
-					New-ItemProperty -Path $KeyPath3 -Name "default" -Type String -Value 1 | Out-Null
-					New-ItemProperty -Path $KeyPath3 -Name "ParamDesc" -Type String -Value "Receive Side Scaling" | Out-Null
-					New-ItemProperty -Path $KeyPath3 -Name "type" -Type String -Value "enum" | Out-Null
-					New-ItemProperty -Path $KeyPath2 -Name "0" -Type String -Value "Disabled" | Out-Null
-					New-ItemProperty -Path $KeyPath2 -Name "1" -Type String -Value "Enabled" | Out-Null
-					New-ItemProperty -Path $KeyPath4 -Name "1" -Type String -Value "1 Queue" | Out-Null
-					New-ItemProperty -Path $KeyPath4 -Name "2" -Type String -Value "2 Queue" | Out-Null
-					New-ItemProperty -Path $KeyPath4 -Name "3" -Type String -Value "3 Queue" | Out-Null
-					New-ItemProperty -Path $KeyPath4 -Name "4" -Type String -Value "4 Queue" | Out-Null
-					New-ItemProperty -Path $KeyPath5 -Name "default" -Type String -Value "2" | Out-Null
-					New-ItemProperty -Path $KeyPath5 -Name "ParamDesc" -Type String -Value "Maximum Number of RSS Queues" | Out-Null
-					New-ItemProperty -Path $KeyPath5 -Name "type" -Type String -Value "enum" | Out-Null
-					Set-ItemProperty -Path $KeyPath6 -Name "Max" -Type String -Value 6144 | Out-Null
-					Set-ItemProperty -Path $KeyPath6 -Name "Default" -Type String -Value 2048 | Out-Null
-					Set-ItemProperty -Path $KeyPath7 -Name "Max" -Type String -Value 6144 | Out-Null
-					Set-ItemProperty -Path $KeyPath7 -Name "Default" -Type String -Value 4096 | Out-Null
-		}
-				Else
-		{
-			Write-Host "The path ($KeyPath) not found."
-		}
-	}
- $ErrorActionPreference = $errpref #restore previous preference
-}
 
 #Remove Edit with 3D Paint
 Function RemoveEdit3D {
@@ -3347,19 +3279,6 @@ cmd /c 'ipconfig /release 2>nul' >$null
 cmd /c 'ipconfig /renew 2>nul' >$null
 cmd /c 'ipconfig /flushdns 2>nul' >$null
 cmd /c 'echo Flush DNS + IP Reset Completed Successfully!'
-cmd /c 'echo Clearing Temp folders....'
-cmd /c 'del /f /s /q %systemdrive%\*.tmp 2>nul' >$null
-cmd /c 'del /f /s /q %systemdrive%\*._mp 2>nul' >$null
-cmd /c 'del /f /s /q %systemdrive%\*.log 2>nul' >$null
-cmd /c 'del /f /s /q %systemdrive%\*.gid 2>nul' >$null
-cmd /c 'del /f /s /q %systemdrive%\*.chk 2>nul' >$null
-cmd /c 'del /f /s /q %systemdrive%\*.old 2>nul' >$null
-cmd /c 'del /f /s /q %systemdrive%\recycled\*.* 2>nul' >$null
-cmd /c 'del /f /s /q %windir%\*.bak 2>nul' >$null
-cmd /c 'del /f /s /q %windir%\prefetch\*.* 2>nul' >$null
-cmd /c 'del /f /q %userprofile%\cookies\*.* 2>nul' >$null
-cmd /c 'del /f /q %userprofile%\recent\*.* 2>nul' >$null
-cmd /c 'del /f /s /q %userprofile%\Local Settings\Temporary Internet Files\*.* 2>nul' >$null
 $errpref = $ErrorActionPreference #save actual preference
 $ErrorActionPreference = "silentlycontinue"
 Get-ChildItem -Path "$env:temp" -Exclude "dmtmp" | ForEach-Object ($_) {
@@ -3368,8 +3287,6 @@ Get-ChildItem -Path "$env:temp" -Exclude "dmtmp" | ForEach-Object ($_) {
        "CLEANED... :" + $_.fullname
    }
 $ErrorActionPreference = $errpref #restore previous preference
-cmd /c 'del /f /s /q %userprofile%\recent\*.* 2>nul' >$null
-cmd /c 'del /f /s /q %windir%\Temp\*.* 2>nul' >$null
 cmd /c 'echo Temp folders Cleared Successfully!'
 }
 
